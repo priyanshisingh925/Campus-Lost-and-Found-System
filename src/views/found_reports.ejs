@@ -1,0 +1,48 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/admin">Dashboard</a> <span class="sep">/</span> Found Reports</div>
+
+<div class="pagehead" style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap">
+  <div>
+    <h1 style="margin-bottom:4px">Found Reports</h1>
+    <p class="sub muted" style="margin:0">Click a row to see full details and its matches.</p>
+  </div>
+  <a class="btn secondary" href="/admin/box-entry">＋ Add Found Item (Box)</a>
+</div>
+
+<% if (notice) { %><div class="notice ok"><%= notice %></div><% } %>
+
+<div class="toolbar">
+  <form method="get" action="/admin/found-reports">
+    <input type="text" name="q" value="<%= search %>" placeholder="Search item, category, location…">
+    <button class="btn secondary small">Search</button>
+    <% if (search) { %><a class="btn secondary small" href="/admin/found-reports">Clear</a><% } %>
+  </form>
+  <span class="spacer"></span>
+  <a class="btn secondary small" href="/admin/found-reports/export.csv<%= search ? `?q=${encodeURIComponent(search)}` : '' %>">Export CSV</a>
+</div>
+
+<p class="sub muted"><%= count %> report<%= count === 1 ? '' : 's' %><%= search ? ` matching “${search}”` : '' %>.</p>
+
+<% if (reports.length) { %>
+  <div class="tablewrap">
+  <table>
+    <tr><th>ID</th><th>Item</th><th>Category</th><th>Location</th><th>Date Found</th><th>Source</th><th>Status</th></tr>
+    <% reports.forEach(r => { %>
+      <tr class="rowlink" data-href="/admin/found-reports/<%= r.found_id %>">
+        <td class="nowrap">#<%= r.found_id %></td>
+        <td><%= r.item_name %></td>
+        <td><%= r.category %></td>
+        <td><%= r.location_name %></td>
+        <td class="nowrap"><%= r.found_date %></td>
+        <td><span class="badge <%= String(r.source).toLowerCase() %>"><%= r.source %></span></td>
+        <td><span class="badge <%= String(r.status).toLowerCase() %>"><%= r.status %></span></td>
+      </tr>
+    <% }) %>
+  </table>
+  </div>
+<% } else { %>
+  <div class="notice info">No found reports yet.</div>
+<% } %>
+
+<%- include('partials/footer') %>

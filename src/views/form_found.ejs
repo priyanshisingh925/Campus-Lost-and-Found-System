@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/">Home</a> <span class="sep">/</span> Found Form</div>
+
+<h1>I found something</h1>
+<p class="sub muted">Tell us what you found and how you're handing it over. We'll check it against open lost reports right away.</p>
+
+<% if (typeof error !== 'undefined' && error) { %><div class="notice error"><%= error %></div><% } %>
+
+<%- include('_form_partial', { mode: 'found' }) %>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,69 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/admin">Dashboard</a> <span class="sep">/</span> <a href="/admin/found-reports">Found Reports</a> <span class="sep">/</span> Add from Box</div>
+
+<h1>Add Found Item from the Box</h1>
+<p class="sub muted">For items handed to the physical Lost &amp; Found box. Stored with source <span class="badge box">BOX</span>.</p>
+
+<% if (errors.length) { %>
+  <div class="errors"><b>Please fix the following:</b><ul><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+<% } %>
+
+<div class="card" style="max-width:640px">
+<form method="post" action="/admin/box-entry" enctype="multipart/form-data">
+  <div class="field">
+    <label>Item name *</label>
+    <input name="item_name" required maxlength="100" value="<%= values.item_name || '' %>">
+  </div>
+  <div class="field">
+    <label>Category *</label>
+    <select name="category" required>
+      <option value="">— select —</option>
+      <% categories.forEach(c => { %>
+        <option value="<%= c %>" <%= values.category === c ? 'selected' : '' %>><%= c %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label>Color</label>
+      <input name="color" maxlength="30" placeholder="e.g. Black" value="<%= values.color || '' %>">
+    </div>
+    <div class="field">
+      <label>Brand</label>
+      <input name="brand" maxlength="40" placeholder="e.g. Samsung" value="<%= values.brand || '' %>">
+    </div>
+  </div>
+  <div class="field">
+    <label>Location found *</label>
+    <input name="location_name" list="box_loc_list" required maxlength="60" placeholder="e.g. Library" value="<%= values.location_name || '' %>">
+    <datalist id="box_loc_list">
+      <% locations.forEach(l => { %><option value="<%= l.location_name %>"></option><% }) %>
+    </datalist>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label>Date found *</label>
+      <input type="date" name="found_date" required value="<%= values.found_date || '' %>">
+    </div>
+    <div class="field">
+      <label>Approx. time</label>
+      <input type="time" name="found_time" value="<%= values.found_time || '' %>">
+    </div>
+  </div>
+  <div class="field">
+    <label>Description *</label>
+    <textarea name="description" required maxlength="500" rows="3"><%= values.description || '' %></textarea>
+  </div>
+  <div class="field">
+    <label>Photo (optional)</label>
+    <input type="file" name="photo" accept="image/*">
+  </div>
+  <div class="btn-row">
+    <button class="btn" type="submit">Add item</button>
+    <a class="btn secondary" href="/admin/found-reports">Cancel</a>
+  </div>
+</form>
+</div>
+
+<%- include('partials/footer') %>

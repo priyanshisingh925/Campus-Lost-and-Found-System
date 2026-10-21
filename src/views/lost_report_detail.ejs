@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/admin">Dashboard</a> <span class="sep">/</span> <a href="/admin/lost-reports">Lost Reports</a> <span class="sep">/</span> #<%= report.lost_id %></div>
+
+<h1>Lost Report #<%= report.lost_id %></h1>
+
+<div class="cols" style="margin-top:14px">
+  <div class="card">
+    <h3>Item</h3>
+    <div class="kv"><b>Item</b> <%= report.item_name %></div>
+    <div class="kv"><b>Category</b> <%= report.category %></div>
+    <div class="kv"><b>Color</b> <%= report.color || '—' %></div>
+    <div class="kv"><b>Brand</b> <%= report.brand || '—' %></div>
+    <div class="kv"><b>Location</b> <%= report.location_name %></div>
+    <div class="kv"><b>Date</b> <%= report.lost_date %> <%= report.lost_time || '' %></div>
+    <div class="kv"><b>Status</b> <span class="badge <%= String(report.status).toLowerCase() %>"><%= report.status %></span></div>
+    <div class="kv"><b>Description</b> <%= report.description %></div>
+    <% if (report.photo) { %><img class="photo" src="/<%= report.photo %>" alt="photo"><% } %>
+  </div>
+  <div class="card">
+    <h3>Reported by</h3>
+    <div class="kv"><b>Name</b> <%= report.reporter %></div>
+    <div class="kv"><b>Email</b> <a href="mailto:<%= report.email %>"><%= report.email %></a></div>
+    <div class="kv"><b>Phone</b> <a href="tel:<%= report.phone %>"><%= report.phone %></a></div>
+  </div>
+</div>
+
+<h2>Matches involving this report</h2>
+<% if (matches.length) { %>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Match ID</th><th class="num">Score</th><th>Status</th></tr>
+    <% matches.forEach(m => { %>
+      <tr class="rowlink" data-href="/admin/matches/<%= m.match_id %>">
+        <td class="nowrap">#<%= m.match_id %></td>
+        <td class="num"><span class="score-pill <%= Math.round(m.match_score) >= 80 ? 'score-hi' : Math.round(m.match_score) >= 60 ? 'score-mid' : 'score-lo' %>"><%= Math.round(m.match_score) %>%</span></td>
+        <td><span class="badge <%= String(m.status).toLowerCase() %>"><%= m.status %></span></td>
+      </tr>
+    <% }) %>
+  </table>
+  </div>
+  <p class="muted">Click a row to open the match.</p>
+<% } else { %>
+  <div class="notice info">No matches generated for this report yet.</div>
+<% } %>
+
+<%- include('partials/footer') %>

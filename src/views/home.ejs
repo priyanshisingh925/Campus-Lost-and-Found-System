@@ -1,0 +1,41 @@
+<%- include('partials/header') %>
+
+<div class="hero">
+  <div class="eyebrow">The front desk, but online</div>
+  <h1 class="blur-text">Lost it? Found it? <em>Post it here.</em></h1>
+  <p>Drop a quick report and we'll check it against everything handed in. When something lines up, the desk gets in touch with both of you.</p>
+</div>
+
+<div class="choices">
+  <a class="choice spotlight" href="/lost">
+    <span class="c-num">01</span>
+    <span class="c-title">I lost something</span>
+    <small>Report an item you misplaced</small>
+  </a>
+  <a class="choice spotlight" href="/found">
+    <span class="c-num">02</span>
+    <span class="c-title">I found something</span>
+    <small>Report an item you picked up</small>
+  </a>
+  <a class="choice spotlight" href="<%= typeof isAdmin === 'undefined' || !isAdmin ? '/admin/login' : '/admin' %>">
+    <span class="c-num">03</span>
+    <span class="c-title">Desk staff</span>
+    <small>Lost &amp; Found desk / staff only</small>
+  </a>
+</div>
+
+<div class="btn-row" style="justify-content:center; margin-top:18px">
+  <a class="muted" href="/how-it-works" style="font-size:14px">Curious how the matching works? See How It Works →</a>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <b>How it works</b>
+  <ol>
+    <li>Students report lost or found items using the simple forms above.</li>
+    <li>Items left in the physical <b>Lost &amp; Found Box</b> are entered by the admin.</li>
+    <li>The system compares reports in the database and generates <b>possible matches</b> with a score out of 100.</li>
+    <li>The admin contacts both parties and marks confirmed returns as <b>resolved</b>.</li>
+  </ol>
+</div>
+
+<%- include('partials/footer') %>

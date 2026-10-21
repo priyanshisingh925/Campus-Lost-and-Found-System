@@ -1,0 +1,27 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/admin">Dashboard</a> <span class="sep">/</span> <a href="/admin/matches?status=RESOLVED">Resolved</a> <span class="sep">/</span> History</div>
+
+<h1>Resolved Matches</h1>
+<p class="sub muted">Matches that were confirmed and closed, newest first.</p>
+
+<% if (rows.length) { %>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Match</th><th>Lost Item</th><th>Found Item</th><th class="num">Score</th><th>Resolved On</th></tr>
+    <% rows.forEach(r => { %>
+      <tr class="rowlink" data-href="/admin/matches/<%= r.match_id %>">
+        <td class="nowrap">#<%= r.match_id %></td>
+        <td><%= r.lost_item %></td>
+        <td><%= r.found_item %></td>
+        <td class="num"><span class="score-pill score-hi"><%= Math.round(r.match_score) %>%</span></td>
+        <td class="nowrap"><%= r.resolved_at ? new Date(r.resolved_at).toLocaleDateString() : '—' %></td>
+      </tr>
+    <% }) %>
+  </table>
+  </div>
+<% } else { %>
+  <div class="notice info">Nothing resolved yet. Confirmed matches appear here.</div>
+<% } %>
+
+<%- include('partials/footer') %>

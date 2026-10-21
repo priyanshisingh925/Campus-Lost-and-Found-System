@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/admin">Dashboard</a> <span class="sep">/</span> Lost Reports</div>
+
+<h1>Lost Reports</h1>
+<p class="sub muted">Click a row to see full details and its matches.</p>
+
+<% if (notice) { %><div class="notice ok"><%= notice %></div><% } %>
+
+<div class="toolbar">
+  <form method="get" action="/admin/lost-reports">
+    <input type="text" name="q" value="<%= search %>" placeholder="Search item, category, location…">
+    <button class="btn secondary small">Search</button>
+    <% if (search) { %><a class="btn secondary small" href="/admin/lost-reports">Clear</a><% } %>
+  </form>
+  <span class="spacer"></span>
+  <a class="btn secondary small" href="/admin/lost-reports/export.csv<%= search ? `?q=${encodeURIComponent(search)}` : '' %>">Export CSV</a>
+</div>
+
+<p class="sub muted"><%= count %> report<%= count === 1 ? '' : 's' %><%= search ? ` matching “${search}”` : '' %>.</p>
+
+<% if (reports.length) { %>
+  <div class="tablewrap">
+  <table>
+    <tr><th>ID</th><th>Item</th><th>Category</th><th>Location</th><th>Date Lost</th><th>Status</th></tr>
+    <% reports.forEach(r => { %>
+      <tr class="rowlink" data-href="/admin/lost-reports/<%= r.lost_id %>">
+        <td class="nowrap">#<%= r.lost_id %></td>
+        <td><%= r.item_name %></td>
+        <td><%= r.category %></td>
+        <td><%= r.location_name %></td>
+        <td class="nowrap"><%= r.lost_date %></td>
+        <td><span class="badge <%= String(r.status).toLowerCase() %>"><%= r.status %></span></td>
+      </tr>
+    <% }) %>
+  </table>
+  </div>
+<% } else { %>
+  <div class="notice info">No lost reports yet.</div>
+<% } %>
+
+<%- include('partials/footer') %>

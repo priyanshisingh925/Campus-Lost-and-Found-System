@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/">Home</a> <span class="sep">/</span> Lost Form</div>
+
+<h1>I lost something</h1>
+<p class="sub muted">Fill in what you lost. The more detail you give, the better the automatic matching works.</p>
+
+<% if (typeof error !== 'undefined' && error) { %><div class="notice error"><%= error %></div><% } %>
+
+<%- include('_form_partial', { mode: 'lost' }) %>
+
+<%- include('partials/footer') %>

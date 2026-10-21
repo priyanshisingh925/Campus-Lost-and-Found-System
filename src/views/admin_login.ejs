@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+
+<h1>Admin Login</h1>
+<p class="sub muted">Sign in to review reports and manage matches.</p>
+
+<% if (error) { %><div class="notice err"><%= error %></div><% } %>
+
+<div class="card" style="max-width:420px; margin-top:14px">
+  <form method="post" action="/admin/login" class="stack">
+    <label>Email
+      <input type="email" name="email" required autofocus>
+    </label>
+    <label>Password
+      <input type="password" name="password" required>
+    </label>
+    <button class="btn" style="width:100%">Sign in</button>
+  </form>
+  <p class="muted small" style="margin-bottom:0; text-align:center">Demo access — admin@campus.edu / admin123</p>
+</div>
+
+<%- include('partials/footer') %>

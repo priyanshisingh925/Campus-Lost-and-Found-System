@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/admin">Dashboard</a> <span class="sep">/</span> <a href="/admin/matches">Matches</a> <span class="sep">/</span> #<%= match.match_id %></div>
+
+<h1>Match #<%= match.match_id %> <span class="score-pill <%= score >= 80 ? 'score-hi' : score >= 60 ? 'score-mid' : 'score-lo' %>" style="vertical-align:middle"><%= score %>%</span></h1>
+
+<div class="cols" style="margin-top:14px">
+  <div class="card">
+    <div class="pill lost">LOST</div>
+    <h3 style="margin-top:8px"><%= lost.item_name %></h3>
+    <div class="kv"><b>Category</b> <%= lost.category %></div>
+    <div class="kv"><b>Color</b> <%= lost.color || '—' %></div>
+    <div class="kv"><b>Brand</b> <%= lost.brand || '—' %></div>
+    <div class="kv"><b>Location</b> <%= lost.location_name %></div>
+    <div class="kv"><b>Date</b> <%= lost.lost_date %></div>
+    <div class="kv"><b>Status</b> <span class="badge <%= String(lost.status).toLowerCase() %>"><%= lost.status %></span></div>
+    <div class="kv"><b>Description</b> <%= lost.description %></div>
+    <% if (lost.photo) { %><img class="photo" src="/<%= lost.photo %>" alt="photo"><% } %>
+    <h4 style="margin-top:12px">Reported by</h4>
+    <div class="kv"><b>Name</b> <%= lost.reporter %></div>
+    <div class="kv"><b>Email</b> <a href="mailto:<%= lost.email %>"><%= lost.email %></a></div>
+    <div class="kv"><b>Phone</b> <a href="tel:<%= lost.phone %>"><%= lost.phone %></a></div>
+  </div>
+
+  <div class="card">
+    <div class="pill found">FOUND</div>
+    <h3 style="margin-top:8px"><%= found.item_name %></h3>
+    <div class="kv"><b>Category</b> <%= found.category %></div>
+    <div class="kv"><b>Color</b> <%= found.color || '—' %></div>
+    <div class="kv"><b>Brand</b> <%= found.brand || '—' %></div>
+    <div class="kv"><b>Location</b> <%= found.location_name %></div>
+    <div class="kv"><b>Date</b> <%= found.found_date %></div>
+    <div class="kv"><b>Source</b> <span class="badge <%= String(found.source).toLowerCase() %>"><%= found.source %></span></div>
+    <div class="kv"><b>Status</b> <span class="badge <%= String(found.status).toLowerCase() %>"><%= found.status %></span></div>
+    <div class="kv"><b>Description</b> <%= found.description %></div>
+    <% if (found.photo) { %><img class="photo" src="/<%= found.photo %>" alt="photo"><% } %>
+    <h4 style="margin-top:12px">Found by</h4>
+    <div class="kv"><b>Name</b> <%= found.reporter %></div>
+    <div class="kv"><b>Email</b> <a href="mailto:<%= found.email %>"><%= found.email %></a></div>
+    <div class="kv"><b>Phone</b> <a href="tel:<%= found.phone %>"><%= found.phone %></a></div>
+  </div>
+</div>
+
+<% if (match.status === 'Pending' || match.status === 'PENDING') { %>
+  <div class="card actions">
+    <h3>Actions</h3>
+    <p class="muted">Confirming marks the match resolved, closes both reports, and clears weaker pending matches for the same items.</p>
+    <div class="btnrow">
+      <form method="post" action="/admin/matches/<%= match.match_id %>/resolve"><button class="btn">Confirm match</button></form>
+      <form method="post" action="/admin/matches/<%= match.match_id %>/reject"><button class="btn danger">Not a match</button></form>
+    </div>
+  </div>
+<% } else { %>
+  <div class="notice ok">This match is <%= match.status.toLowerCase() %>.</div>
+<% } %>
+
+<%- include('partials/footer') %>

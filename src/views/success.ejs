@@ -1,0 +1,34 @@
+<%- include('partials/header') %>
+
+<div class="success-box">
+  <h1 style="margin:0 0 6px"><%= heading %></h1>
+</div>
+
+<% if (matches && matches.length) { %>
+  <div class="card">
+    <h2 style="margin-top:0"><%= matchLabel %></h2>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Lost item</th><th>Found item</th><th class="num">Score</th><th>Status</th></tr>
+      <% matches.forEach(m => { %>
+        <tr>
+          <td>#<%= m.lost_id %></td>
+          <td>#<%= m.found_id %></td>
+          <td class="num"><span class="score-pill <%= Math.round(m.score) >= 80 ? 'score-hi' : Math.round(m.score) >= 60 ? 'score-mid' : 'score-lo' %>"><%= Math.round(m.score) %>%</span></td>
+          <td><span class="badge pending">pending admin check</span></td>
+        </tr>
+      <% }) %>
+    </table>
+    </div>
+    <p class="muted">The admin will contact you if a match is confirmed.</p>
+  </div>
+<% } else { %>
+  <p class="muted">No automatic matches yet — the admin will review your report.</p>
+<% } %>
+
+<div class="btn-row">
+  <a class="btn" href="/">Back to home</a>
+  <a class="btn secondary" href="<%= againHref %>">Submit another report</a>
+</div>
+
+<%- include('partials/footer') %>

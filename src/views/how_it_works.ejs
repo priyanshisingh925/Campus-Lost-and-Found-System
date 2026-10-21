@@ -1,0 +1,103 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/">Home</a> <span class="sep">/</span> How It Works</div>
+
+<div class="hero" style="padding-top:18px">
+  <h1>How the system works</h1>
+  <p>A plain walkthrough of what happens behind the scenes — from the moment a report is
+     submitted to the moment an item is returned.</p>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0">1. The big picture</h2>
+  <p>The system has two sides. <b>Students</b> report items they lost or found using simple forms.
+     An <b>admin</b> then reviews everything from a dashboard. The heart of the project is a SQL
+     matching engine that compares every lost report against every found report and scores how
+     likely they are to be the same item — so the admin doesn't have to read through everything manually.</p>
+  <pre class="flow">Student submits lost report ──┐
+                              ├──&gt; SQL matching engine ──&gt; possible matches ──&gt; admin reviews
+Student submits found report ─┘        (scores 0–100)         (score ≥ 50)       &amp; contacts both</pre>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0">2. The database</h2>
+  <p>Everything is stored in MySQL across seven tables. Five store the actual data; the other two
+     link things together with <b>foreign keys</b>, which guarantee a report can never point to a
+     user, item, or location that doesn't exist.</p>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Table</th><th>What it holds</th></tr>
+    <tr><td><b>users</b></td><td>Students and admins — name, email, phone, role</td></tr>
+    <tr><td><b>items</b></td><td>The item itself — name, category, color, brand, description, photo</td></tr>
+    <tr><td><b>locations</b></td><td>Campus places (Library, Canteen…) — reused instead of retyped, so spellings stay consistent</td></tr>
+    <tr><td><b>lost_reports</b></td><td>"I lost something" — links a user + item + location, plus the date</td></tr>
+    <tr><td><b>found_reports</b></td><td>"I found something" — same idea, plus a <span class="badge user">USER</span>/<span class="badge box">BOX</span> source tag</td></tr>
+    <tr><td><b>matches</b></td><td>Generated lost↔found pairs with their score and status</td></tr>
+    <tr><td><b>app_settings</b></td><td>Key/value config, e.g. the match threshold (50)</td></tr>
+  </table>
+  </div>
+  <p class="muted">Each person submits a <i>report</i> about an <i>item</i> at a <i>location</i> — three separate
+  tables joined by IDs. That's what makes the data relational: one item is described once, but can appear
+  in many reports and matches without any duplication.</p>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0">3. The matching score</h2>
+  <p>When a report comes in, a stored function <b>FN_COMPUTE_MATCH_SCORE</b> compares it with every
+  candidate on the other side and adds up points:</p>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Criterion</th><th class="num">Points</th><th>Why it matters</th></tr>
+    <tr><td>Same category</td><td class="num">+20</td><td>A watch is never the same item as a wallet — different categories score 0 overall</td></tr>
+    <tr><td>Same item name</td><td class="num">+20</td><td>"Water Bottle" vs "Water Bottle" is a strong signal (partial word matches earn some of it)</td></tr>
+    <tr><td>Same color</td><td class="num">+15</td><td>Two black bags are more likely related than a black and a red one</td></tr>
+    <tr><td>Same brand</td><td class="num">+15</td><td>Narrows "Samsung phone" against "iPhone"</td></tr>
+    <tr><td>Same location</td><td class="num">+20</td><td>Lost and found in the same place is very telling</td></tr>
+    <tr><td>Dates close together</td><td class="num">+10</td><td>Found the same day or a day later is most plausible</td></tr>
+  </table>
+  </div>
+  <p>Only pairs scoring <b>50 or more</b> become visible matches — the threshold lives in
+  <b>app_settings</b>, so it's a data change, not a code change. A perfect pair (like the seeded
+  Samsung Galaxy Watch lost and found in the Library on the same day) reaches <b>100%</b>.</p>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0">4. SQL features this project demonstrates</h2>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Feature</th><th>Where</th><th>What it does</th></tr>
+    <tr><td>Primary &amp; foreign keys</td><td>all tables</td><td>Keep every reference valid; deleting a report cleans up its matches automatically (ON DELETE CASCADE)</td></tr>
+    <tr><td>CHECK constraints</td><td>all tables</td><td>Statuses and scores can never hold invalid values</td></tr>
+    <tr><td>Stored function</td><td>FN_COMPUTE_MATCH_SCORE</td><td>The scoring formula, living inside the database where any query can use it</td></tr>
+    <tr><td>Stored procedure</td><td>SP_REFRESH_MATCHES</td><td>Recomputes all pairs above the threshold; called after every new report</td></tr>
+    <tr><td>Trigger</td><td>TRG_MATCH_AFTER_UPDATE</td><td>Confirming a match automatically resolves both reports — one update, two side effects, no code needed</td></tr>
+    <tr><td>Views</td><td>possible_matches_view, resolved_items_view</td><td>Pre-joined, ready-made queries the admin pages read from</td></tr>
+    <tr><td>Joins &amp; aggregates</td><td>dashboard, queries file</td><td>Counts per status, per category; matches sorted by score</td></tr>
+    <tr><td>UNIQUE / AUTO_INCREMENT</td><td>all tables</td><td>No duplicate emails, no duplicate match pairs; automatic IDs</td></tr>
+  </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0">5. A report's journey</h2>
+  <ol class="steps">
+    <li><b>Submission</b> — the form is validated, then saved in one <b>transaction</b>: user, item,
+        location and report rows all commit together or not at all.</li>
+    <li><b>Matching</b> — right after commit, the refresh procedure runs. New pairs appear on the
+        admin's Possible Matches page, sorted highest score first.</li>
+    <li><b>Review</b> — the admin opens a match and sees both reports side by side with photos and
+        both people's contact details.</li>
+    <li><b>Resolution</b> — confirming the match closes it, resolves both reports via the trigger,
+        and weaker matches for the same items are swept away automatically. The item shows up on the
+        Resolved page — end of the line.</li>
+  </ol>
+  <p class="muted">Items handed to the physical Lost &amp; Found box take a shortcut: the admin enters
+  them directly (Box Entry), tagged as <span class="badge box">BOX</span>, and they join the same matching pool.</p>
+</div>
+
+<div class="btn-row">
+  <a class="btn" href="/lost">Report a lost item</a>
+  <a class="btn secondary" href="/found">Report a found item</a>
+</div>
+
+<%- include('partials/footer') %>

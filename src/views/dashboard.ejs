@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+
+<div class="crumbs"><a href="/admin">Dashboard</a></div>
+
+<h1>Admin Dashboard</h1>
+<p class="sub muted">Signed in as <b><%= adminName %></b></p>
+
+<% if (notice) { %><div class="notice ok"><%= notice %></div><% } %>
+
+<div class="stats">
+  <a class="stat spotlight" href="/admin/lost-reports">
+    <div class="num"><%= counts.lost %></div>
+    <div class="lbl">Open Lost Reports</div>
+    <div class="go">View all →</div>
+  </a>
+  <a class="stat spotlight" href="/admin/found-reports">
+    <div class="num"><%= counts.found %></div>
+    <div class="lbl">Unclaimed Found Reports</div>
+    <div class="go">View all →</div>
+  </a>
+  <a class="stat spotlight" href="/admin/matches">
+    <div class="num"><%= counts.pending %></div>
+    <div class="lbl">Possible Matches</div>
+    <div class="go">Review →</div>
+  </a>
+  <a class="stat spotlight" href="/admin/resolved">
+    <div class="num"><%= counts.resolved %></div>
+    <div class="lbl">Resolved</div>
+    <div class="go">History →</div>
+  </a>
+</div>
+
+<div class="btn-row" style="margin-top:0">
+  <a class="btn secondary" href="/admin/box-entry">＋ Add Found Item (Box)</a>
+</div>
+
+<h2>Top pending matches <span class="muted" style="font-weight:400">(score ≥ <%= threshold %>)</span></h2>
+<% if (top.length) { %>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Lost Item</th><th>Found Item</th><th class="num">Score</th><th>Status</th></tr>
+    <% top.forEach(m => { %>
+      <tr class="rowlink" data-href="/admin/matches/<%= m.match_id %>">
+        <td><%= m.lost_item %> <div class="sub"><%= m.lost_location %> · <%= m.lost_date %></div></td>
+        <td><%= m.found_item %> <div class="sub"><%= m.found_location %> · <%= m.found_date %></div></td>
+        <td class="num"><span class="score-pill <%= Math.round(m.match_score) >= 80 ? 'score-hi' : Math.round(m.match_score) >= 60 ? 'score-mid' : 'score-lo' %>"><%= Math.round(m.match_score) %>%</span></td>
+        <td><span class="badge <%= String(m.match_status).toLowerCase() %>"><%= m.match_status %></span></td>
+      </tr>
+    <% }) %>
+  </table>
+  </div>
+  <p class="muted">Click a row to open the match.</p>
+<% } else { %>
+  <p class="muted">No pending matches at the moment.</p>
+<% } %>
+
+<%- include('partials/footer') %>

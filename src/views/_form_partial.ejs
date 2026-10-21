@@ -1,0 +1,104 @@
+<%# Shared form body for lost/found reports. Header/footer are included by the wrapper views. %>
+
+<% if (errors.length) { %>
+  <div class="errors">
+    <b>Please fix the following:</b>
+    <ul><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul>
+  </div>
+<% } %>
+
+<div class="card">
+<form method="POST" action="<%= action %>" enctype="multipart/form-data">
+
+  <h2>Your contact details</h2>
+  <div class="field">
+    <label for="name">Name *</label>
+    <input type="text" id="name" name="name" maxlength="100" required
+           value="<%= values.name || '' %>">
+  </div>
+  <div class="field">
+    <label for="email">Email *</label>
+    <input type="email" id="email" name="email" maxlength="120" required
+           value="<%= values.email || '' %>">
+  </div>
+  <div class="field">
+    <label for="phone">Phone *</label>
+    <input type="text" id="phone" name="phone" maxlength="15" required
+           value="<%= values.phone || '' %>">
+  </div>
+
+  <h2>Item details</h2>
+  <div class="field">
+    <label for="item_name">Item name *</label>
+    <input type="text" id="item_name" name="item_name" maxlength="150" required
+           value="<%= values.item_name || '' %>">
+  </div>
+  <div class="field">
+    <label for="category">Category *</label>
+    <select id="category" name="category" required>
+      <option value="">— select —</option>
+      <% categories.forEach(c => { %>
+        <option value="<%= c %>" <%= values.category === c ? 'selected' : '' %>><%= c %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field">
+    <label for="description">Description *</label>
+    <textarea id="description" name="description" required><%= values.description || '' %></textarea>
+    <div class="hint">Colour, marks, contents — anything that helps identify it.</div>
+  </div>
+  <div class="field">
+    <label for="color">Color (optional)</label>
+    <input type="text" id="color" name="color" maxlength="30" value="<%= values.color || '' %>">
+  </div>
+  <div class="field">
+    <label for="brand">Brand (optional)</label>
+    <input type="text" id="brand" name="brand" maxlength="50" value="<%= values.brand || '' %>">
+  </div>
+  <div class="field">
+    <label for="photo">Photo (optional)</label>
+    <input type="file" id="photo" name="photo" accept="image/*">
+  </div>
+
+  <h2>Where &amp; when</h2>
+  <div class="field">
+    <label for="location_name">Location *</label>
+    <input type="text" id="location_name" name="location_name" list="location_list"
+           maxlength="80" required value="<%= values.location_name || '' %>">
+    <datalist id="location_list">
+      <% locations.forEach(l => { %>
+        <option value="<%= l.location_name %>"></option>
+      <% }) %>
+    </datalist>
+    <div class="hint">Pick a common one (Library, Canteen, Block A…) or type a new one.</div>
+  </div>
+  <div class="field">
+    <label for="report_date">Date *</label>
+    <input type="date" id="report_date" name="report_date" required
+           value="<%= values.report_date || '' %>">
+  </div>
+  <div class="field">
+    <label for="report_time">Approximate time (optional)</label>
+    <input type="time" id="report_time" name="report_time" value="<%= values.report_time || '' %>">
+  </div>
+
+  <% if (action === '/found') { %>
+  <h2>How was the item submitted?</h2>
+  <fieldset>
+    <label style="font-weight:400">
+      <input type="radio" name="source" value="USER"
+             <%= values.source !== 'BOX' ? 'checked' : '' %>>
+      I am keeping the item temporarily
+    </label>
+    <label style="font-weight:400">
+      <input type="radio" name="source" value="BOX"
+             <%= values.source === 'BOX' ? 'checked' : '' %>>
+      I handed it to the Lost &amp; Found Box/Admin
+    </label>
+  </fieldset>
+  <% } %>
+
+  <button class="btn" type="submit">Submit report</button>
+  <a class="btn secondary" href="/">Cancel</a>
+</form>
+</div>

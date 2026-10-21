@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · Campus Lost &amp; Found</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    // apply saved theme before first paint to avoid a flash of the wrong one
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    } catch (e) { /* ignore */ }
+  </script>
+</head>
+<body>
+<%
+  // one shared navigation model: public pages, admin pages, and a way back
+  const publicNav = [
+    { href: '/', label: 'Home', match: (p) => p === '/' },
+    { href: '/lost', label: 'Report Lost', match: (p) => p.startsWith('/lost') },
+    { href: '/found', label: 'Report Found', match: (p) => p.startsWith('/found') },
+    { href: '/how-it-works', label: 'How It Works', match: (p) => p.startsWith('/how-it-works') },
+  ];
+  const adminNav = [
+    { href: '/admin', label: 'Dashboard', match: (p) => p === '/admin' },
+    { href: '/admin/lost-reports', label: 'Lost Reports', match: (p) => p.startsWith('/admin/lost-reports') },
+    { href: '/admin/found-reports', label: 'Found Reports', match: (p) => p.startsWith('/admin/found-reports') },
+    { href: '/admin/matches', label: 'Matches', match: (p) => p.startsWith('/admin/matches') || p.startsWith('/admin/resolved') },
+    { href: '/admin/box-entry', label: 'Box Entry', match: (p) => p.startsWith('/admin/box-entry') },
+  ];
+  const isAdminArea = typeof path === 'undefined' ? false : String(path).startsWith('/admin');
+  const isLoggedAdmin = typeof isAdmin === 'undefined' ? false : !!isAdmin;
+  const current = typeof path === 'undefined' ? '' : String(path);
+  // inside admin area (logged in): Home first, then admin pages.
+  // login page or logged out: always the public nav so nothing dead-ends.
+  const items = (isAdminArea && isLoggedAdmin)
+    ? [{ href: '/', label: 'Home', match: (p) => p === '/' }, ...adminNav]
+    : publicNav;
+%>
+<header class="topbar">
+  <a class="brand" href="/">Campus <span>Lost &amp; Found</span></a>
+  <nav>
+    <% items.forEach(it => { %>
+      <a href="<%= it.href %>" class="<%= it.match(current) ? 'active' : '' %>"><%= it.label %></a>
+    <% }); %>
+    <span class="divider"></span>
+    <% if (isLoggedAdmin) { %>
+      <% if (!isAdminArea) { %><a href="/admin">Dashboard</a><% } %>
+      <form method="POST" action="/admin/logout" style="display:inline">
+        <button type="submit" class="navout">Log out</button>
+      </form>
+    <% } else { %>
+      <a href="/admin/login">Admin</a>
+    <% } %>
+    <button type="button" class="theme-toggle" title="Toggle light / dark" aria-label="Toggle light / dark"></button>
+  </nav>
+</header>
+<main>
